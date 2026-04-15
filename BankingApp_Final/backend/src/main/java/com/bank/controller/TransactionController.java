@@ -64,7 +64,7 @@ public class TransactionController {
 	}
 
 	@GetMapping("/history/{accNo}")
-	public ResponseEntity<ApiResponse<List<String>>> historyForAccount(@PathVariable String accNo) {
+	public ResponseEntity<ApiResponse<List<String>>> historyForAccount(@PathVariable("accNo") String accNo) {
 		List<String> filtered = FileReportUtil.readAllLines().stream()
 			.filter(line -> line.contains("Acc: " + accNo) || line.contains("to " + accNo))
 			.toList();
@@ -72,12 +72,12 @@ public class TransactionController {
 	}
 
 	@GetMapping("/query-history")
-	public ResponseEntity<ApiResponse<List<String>>> queryHistory(@RequestParam(required = false) String accNo,
-			@RequestParam(required = false) String type,
-			@RequestParam(required = false) String minAmount,
-			@RequestParam(required = false) String maxAmount,
-			@RequestParam(required = false) String from,
-			@RequestParam(required = false) String to) {
+	public ResponseEntity<ApiResponse<List<String>>> queryHistory(@RequestParam(value = "accNo", required = false) String accNo,
+			@RequestParam(value = "type", required = false) String type,
+			@RequestParam(value = "minAmount", required = false) String minAmount,
+			@RequestParam(value = "maxAmount", required = false) String maxAmount,
+			@RequestParam(value = "from", required = false) String from,
+			@RequestParam(value = "to", required = false) String to) {
 		Double min = parseDouble(minAmount);
 		Double max = parseDouble(maxAmount);
 		LocalDate fromDate = parseDate(from);
@@ -113,7 +113,7 @@ public class TransactionController {
 	}
 
 	@GetMapping("/analytics/overview")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> overview(@RequestParam(required = false) String accNo) {
+	public ResponseEntity<ApiResponse<Map<String, Object>>> overview(@RequestParam(value = "accNo", required = false) String accNo) {
 		List<HistoryItem> items = FileReportUtil.readAllLines().stream()
 			.map(TransactionController::parseHistoryLine)
 			.filter(item -> item != null)

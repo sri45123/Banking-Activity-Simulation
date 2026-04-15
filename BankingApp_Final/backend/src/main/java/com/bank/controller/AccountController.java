@@ -38,7 +38,7 @@ public class AccountController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<ApiResponse<Account>> get(@PathVariable String id) throws Exception {
+	public ResponseEntity<ApiResponse<Account>> get(@PathVariable("id") String id) throws Exception {
 		Account account = accountService.getAccount(id);
 		return ResponseEntity.ok(new ApiResponse<>("SUCCESS", "Account fetched successfully", account));
 	}
@@ -49,8 +49,8 @@ public class AccountController {
 	}
 
 	@GetMapping("/search")
-	public ResponseEntity<ApiResponse<List<Account>>> search(@org.springframework.web.bind.annotation.RequestParam(required = false) String name,
-			@org.springframework.web.bind.annotation.RequestParam(required = false) String email) {
+	public ResponseEntity<ApiResponse<List<Account>>> search(@org.springframework.web.bind.annotation.RequestParam(value = "name", required = false) String name,
+			@org.springframework.web.bind.annotation.RequestParam(value = "email", required = false) String email) {
 		List<Account> matches = accountService.searchAccounts(name, email);
 		String message = matches.isEmpty() ? "No matching accounts found" : "Accounts fetched successfully";
 		return ResponseEntity.ok(new ApiResponse<>("SUCCESS", message, matches));

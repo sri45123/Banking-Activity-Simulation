@@ -511,15 +511,17 @@ async function loadDashboard() {
     const accNo = document.getElementById("dash-acc").value.trim();
     const qs = accNo ? "?accNo=" + encodeURIComponent(accNo) : "";
     try {
-        const data = await apiRequest("/analytics/overview" + qs, "GET");
-        document.getElementById("kpi-deposit").textContent = "Rs " + Number(data.totalDeposit || 0).toFixed(2);
-        document.getElementById("kpi-withdraw").textContent = "Rs " + Number(data.totalWithdraw || 0).toFixed(2);
-        document.getElementById("kpi-transfer").textContent = "Rs " + Number(data.totalTransfer || 0).toFixed(2);
+        const response = await apiRequest("/transactions/analytics/overview" + qs, "GET");
+        const data = response && typeof response === "object" && response.data ? response.data : response;
 
-        renderDwChart(Number(data.totalDeposit || 0), Number(data.totalWithdraw || 0));
-        renderMonthlyChart(data.monthlySpending || {});
+        document.getElementById("kpi-deposit").textContent = "Rs " + Number(data?.totalDeposit || 0).toFixed(2);
+        document.getElementById("kpi-withdraw").textContent = "Rs " + Number(data?.totalWithdraw || 0).toFixed(2);
+        document.getElementById("kpi-transfer").textContent = "Rs " + Number(data?.totalTransfer || 0).toFixed(2);
 
-        const recent = Array.isArray(data.recentTransactions) ? data.recentTransactions : [];
+        renderDwChart(Number(data?.totalDeposit || 0), Number(data?.totalWithdraw || 0));
+        renderMonthlyChart(data?.monthlySpending || {});
+
+        const recent = Array.isArray(data?.recentTransactions) ? data.recentTransactions : [];
         document.getElementById("dash-recent").innerHTML = recent.length
             ? recent.map((line) => "<li>" + line + "</li>").join("")
             : "<li>No transactions available.</li>";
@@ -531,6 +533,9 @@ async function loadDashboard() {
 }
 
 function renderDwChart(depositTotal, withdrawTotal) {
+    if (typeof Chart === "undefined") {
+        return;
+    }
     const ctx = document.getElementById("dw-chart");
     if (dwChart) {
         dwChart.destroy();
@@ -549,6 +554,9 @@ function renderDwChart(depositTotal, withdrawTotal) {
 }
 
 function renderMonthlyChart(monthlySpending) {
+    if (typeof Chart === "undefined") {
+        return;
+    }
     const labels = Object.keys(monthlySpending);
     const values = labels.map((k) => Number(monthlySpending[k]));
     const ctx = document.getElementById("monthly-chart");

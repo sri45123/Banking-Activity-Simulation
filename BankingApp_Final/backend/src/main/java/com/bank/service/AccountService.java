@@ -43,7 +43,12 @@ public class AccountService {
 			throw new InvalidAmountException("Opening balance should not be Negative");
 		}
 
-		Account acc = new Account(name, email, balance);
+		String normalizedEmail = email == null ? "" : email.trim();
+		if (repo.findByEmailIgnoreCase(normalizedEmail).isPresent()) {
+			throw new IllegalArgumentException("An account already exists for email: " + normalizedEmail);
+		}
+
+		Account acc = new Account(name, normalizedEmail, balance);
 		acc.setAccountNumber(String.valueOf(ACCOUNT_COUNTER.getAndIncrement()));
 		return repo.save(acc);
 	}
